@@ -6,11 +6,13 @@ import com.mmall.param.DeptParm;
 import com.mmall.service.SysDeptService;
 import com.mmall.service.SysTreeService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -31,7 +33,7 @@ public class SysDeptController {
 
     @Resource
     private SysTreeService sysTreeService;
-    @PostMapping("sava.json")
+    @PostMapping(value = "sava.json",produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public JsonData saveDept(DeptParm deptParm){
         sysDeptService.save(deptParm);
@@ -42,6 +44,17 @@ public class SysDeptController {
     public JsonData tree(){
         List<DeptLevelDto> dtoList=sysTreeService.deptTree();
         return JsonData.success(dtoList);
+    }
+
+    @PostMapping("update.json")
+    @ResponseBody
+    public JsonData updateDept(DeptParm deptParm){
+        sysDeptService.update(deptParm);
+        return JsonData.success();
+    }
+    @GetMapping("dept.page")
+    public ModelAndView page(){
+        return new ModelAndView("dept");
     }
 }
 

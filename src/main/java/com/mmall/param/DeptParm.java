@@ -26,7 +26,7 @@ public class DeptParm {
     @Length(max = 15,min = 2,message = "部门名称长度2到15之间")
     private String name;
 
-    private Integer parentId;
+    private Integer parentId=0;
     /**
      * 顺序
      */
