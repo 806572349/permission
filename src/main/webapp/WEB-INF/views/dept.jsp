@@ -188,7 +188,9 @@
     $(function () {
         var deptList; // 存储树形部门列表
         var deptMap = {};//存储map格式的部门信息
+        var opetionStr;
         var deptListTemplate = $('#deptListTemplate').html();
+        var lastClickDeptId=-1;
         Mustache.parse(deptListTemplate);
         loadDeptTree();
 
@@ -224,8 +226,158 @@
         }
         //绑定部门点击事件
         function bindDeptClick() {
+            $(".dept-delete").click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var deptId=$(this).attr("data-id");
+                var deptName=$(this).attr("data-name");
+                if(confirm("确定要删除部门｛"+deptName+"吗")){
+                    //TODO:
+                    console.log("delete depte:"+deptName);
+                }
+            });
+            $(".dept-name").click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var deptId=$(this).attr("data-id");
+                handleDepSelected(deptId);
+
+            });
+
+            $(".dept-edit").click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var deptId=$(this).attr("data-id");
+                handleDepSelected(deptId);
+
+                $("#dialog-dept-form").dialog({
+                    model:true,
+                    title:"编辑部门",
+                    open:function(event,ui){
+                        $(".ui-dialog-titlebar-close",$(this).parent()).hide();
+                        opetionStr="<option value=\"0\">-</option>";
+                        recursiveRenderDeptSelect(deptList,1);
+                        $("#deptForm")[0].reset();
+                        $("#parentId").html(opetionStr);
+                        $("#deptId").val(deptId);
+                        var  targetDept=deptMap[deptId];
+                        if(targetDept){
+                            $("#parentId").val(targetDept.parentId);
+                            $("#deptName").val(targetDept.name);
+                            $("#deptSeq").val(targetDept.seq);
+                            $("#deptRemark").val(targetDept.remark);
+                        }
+                    },
+                    buttons:{
+                        "更新":function (e) {
+                            e.preventDefault();
+                            updateDept(false,function (data) {
+                                $("#dialog-dept-form").dialog("close");
+                            },function (data) {
+                                showMessage("更新部门",data.msg,false);
+                            })
+                        },
+                        "取消":function () {
+                            $("#dialog-dept-form").dialog("close");
+
+                        }
+                    }
+
+                });
+
+            })
+        }
+        function handleDepSelected(deptId) {
+            //
+            if(lastClickDeptId!=-1){
+                var lastDept=$("#dept_" + lastClickDeptId+ " .dd2-content:first");
+                lastDept.removeClass("btn-yellow");
+                lastDept.removeClass("no-hover");
+            }
+            var currentDept=$("#dept_" + deptId+ " .dd2-content:first");
+            currentDept.addClass("btn-yellow");
+            currentDept.addClass("no-hover");
+            lastClickDeptId=deptId;
+            loadUserList(deptId);
+        }
+
+        function loadUserList(deptId) {
+            //TODO:
+            console.log("deptId+"+deptId)
+        }
+
+        $(".dept-add").click(function () {
+            $("#dialog-dept-form").dialog({
+                model:true,
+                title:"新增部门",
+                open:function(event,ui){
+                    $(".ui-dialog-titlebar-close",$(this).parent()).hide();
+                    opetionStr="<option value=\"0\">-</option>";
+                    recursiveRenderDeptSelect(deptList,1);
+                    $("#deptForm")[0].reset();
+                    $("#parentId").html(opetionStr);
+                },
+                buttons:{
+                    "添加":function (e) {
+                        e.preventDefault();
+                        updateDept(true,function (data) {
+                            $("#dialog-dept-form").dialog("close");
+                        },function (data) {
+                            showMessage("新增部门",data.msg,false);
+                        })
+                    },
+                    "取消":function () {
+                        $("#dialog-dept-form").dialog("close");
+                        
+                    }
+                }
+
+            });
+
+
+        });
+        function recursiveRenderDeptSelect(deptList, level) {
+            level=level | 0;
+            if(deptList&&deptList.length>0){
+                $(deptList).each(function (i, dept) {
+                    deptMap[dept.id]=dept;
+                    var  blank="";
+                    if(level>1){
+                        for(var j=3;j<=level;j++){
+                            blank +="..";
+                        }
+                        blank+="*";
+                    }
+                    opetionStr+=Mustache.render("<option value='{{id}}'>{{name}}</option>",{id:dept.id,name:blank+dept.name});
+                    if(dept.deptList.length>0){
+                        recursiveRenderDeptSelect(dept.deptList,level+1);
+                    }
+                })
+            }
+        }
+        
+        
+        function updateDept(isCreate, successCallback, failCallback) {
+            $.ajax({
+                url:isCreate ? "/sys/dept/sava.json":"/sys/dept/update.json",
+                data:$("#deptForm").serializeArray(),
+                type:'POST',
+                success:function (result) {
+                    if(result.ret){
+                        loadDeptTree();
+                        if(successCallback){
+                            successCallback(result);
+                        }
+                    }else {
+                        if(failCallback){
+                            failCallback(result);
+                        }
+                    }
+                }
+            })
 
         }
+
     })
 
 </script>
