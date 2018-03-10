@@ -33,6 +33,7 @@ public class SysDeptController {
 
     @Resource
     private SysTreeService sysTreeService;
+
     @PostMapping(value = "sava.json",produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public JsonData saveDept(DeptParm deptParm){

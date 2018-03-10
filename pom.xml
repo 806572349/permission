@@ -11,6 +11,7 @@
     <properties>
 
         <springframework.version>4.3.13.RELEASE</springframework.version>
+        <JAVA_HOME>C:\Program Files\Java\jdk1.8.0_144</JAVA_HOME>
     </properties>
     <dependencies>
         <dependency>
@@ -148,7 +149,24 @@
             <version>3.6</version>
         </dependency>
     </dependencies>
+
+
     <build>
         <finalName>permission</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <compilerArguments>
+                        <bootclasspath>${JAVA_HOME}/jre/lib/rt.jar</bootclasspath>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
+
 </project>
