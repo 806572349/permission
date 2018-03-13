@@ -153,11 +153,11 @@
   </select>
 
   <update id="batchUpdateLevel" parameterType="map">
-    <foreach collection="sysDeptList" item="sysDept" separator=";">
+    <!--<foreach collection="sysDeptList" item="sysDept" separator=";">-->
       UPDATE sys_dept
-      SET level=#{sysDept.level}
-      WHERE  id=#{sysDept.id}
-    </foreach>
+      SET level=#{level}
+      WHERE  id=#{id}
+    <!--</foreach>-->
   </update>
   <select id="countByNameAndParentId" parameterType="map" resultType="int">
     SELECT  count(1)
