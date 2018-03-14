@@ -1,16 +1,16 @@
 package com.mmall.controller;
 
+import com.mmall.beans.PageQuery;
+import com.mmall.beans.PageResult;
 import com.mmall.common.JsonData;
 import com.mmall.dao.SysUserMapper;
+import com.mmall.model.SysUser;
 import com.mmall.param.DeptParm;
 import com.mmall.param.UserParm;
 import com.mmall.service.SysUserService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -44,6 +44,16 @@ public class SysUserController {
     public JsonData userList(){
 
         return JsonData.success("test");
+    }
+
+    @GetMapping("list.json")
+    @ResponseBody
+    public JsonData page(@RequestParam("deptId")Integer deptId,
+                         PageQuery page
+                         ){
+        PageResult<SysUser> pageByDeptId = sysUserService.getPageByDeptId(deptId, page);
+        return JsonData.success(pageByDeptId);
+
     }
 
 }

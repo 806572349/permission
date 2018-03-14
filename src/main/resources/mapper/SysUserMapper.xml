@@ -184,4 +184,19 @@
     </if>
   </select>
 
+  <select id="countByDeptId" parameterType="map" resultType="int">
+    SELECT  count(1) FROM  sys_user
+    where dept_id=#{deptId}
+
+  </select>
+
+  <select id="getPageByDeptid" parameterType="map" resultMap="BaseResultMap">
+    SELECT   <include refid="Base_Column_List" />
+    FROM  sys_user
+    where dept_id=#{deptId}
+    ORDER BY username ASC
+    LIMIT #{page.offset},#{page.pageSize}
+
+  </select>
+
 </mapper>
