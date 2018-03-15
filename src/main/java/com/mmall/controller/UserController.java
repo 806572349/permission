@@ -3,6 +3,7 @@ package com.mmall.controller;
 import com.mmall.model.SysUser;
 import com.mmall.service.SysUserService;
 import com.mmall.util.MD5Util;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ import java.io.IOException;
  * Date: 2018/3/10
  * To change this template use File | Settings | File Templates.
  */
+@Slf4j
 @Controller
 public class UserController {
     @Resource
@@ -49,8 +51,8 @@ public class UserController {
             errorMsg = "密码为空";
         } else if (sysUser == null) {
             errorMsg = "用户错误";
-        } else if (sysUser.getPassword().equals(MD5Util.encrypt(password))) {
-            errorMsg = "用户冻结";
+        } else if (!sysUser.getPassword().equalsIgnoreCase(MD5Util.encrypt(password))) {
+            errorMsg = "用户密码错误";
         } else {
             request.getSession().setAttribute("user", sysUser);
             if (StringUtils.isNoneBlank(ret)) {

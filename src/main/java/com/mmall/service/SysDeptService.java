@@ -1,11 +1,13 @@
 package com.mmall.service;
 
 import com.google.common.base.Preconditions;
+import com.mmall.common.RequestHolder;
 import com.mmall.dao.SysDeptMapper;
 import com.mmall.exception.ParamException;
 import com.mmall.model.SysDept;
 import com.mmall.param.DeptParm;
 import com.mmall.util.BeanValidator;
+import com.mmall.util.IpUtil;
 import com.mmall.util.LevleUtil;
 import com.sun.xml.internal.bind.v2.TODO;
 import org.apache.commons.collections.CollectionUtils;
@@ -40,8 +42,8 @@ public class SysDeptService {
                 .remark(parm.getRemark()).build();
         dept.setLevel(LevleUtil.calculateLevel(getLevel(parm.getParentId()),parm.getParentId()));
 
-        dept.setOperator("system"); //TODO:
-        dept.setOperateIp("127.0.0.1");
+        dept.setOperator(RequestHolder.getCurrentUser().getUsername()); //TODO:
+        dept.setOperateIp(IpUtil.getUserIP(RequestHolder.getCurrentRequest()));
         dept.setOperateTime(new Date());
         sysDeptMapper.insertSelective(dept);
     }
@@ -61,9 +63,11 @@ public class SysDeptService {
                 .seq(parm.getSeq())
                 .remark(parm.getRemark()).build();
         after.setLevel(LevleUtil.calculateLevel(getLevel(parm.getParentId()),parm.getParentId()));
-        after.setOperator("systemupdate"); //TODO:
-        after.setOperateIp("127.0.0.1");
+        after.setOperator(RequestHolder.getCurrentUser().getUsername()); //TODO:
+        after.setOperateIp(IpUtil.getUserIP(RequestHolder.getCurrentRequest()));
         after.setOperateTime(new Date());
+
+
         updateWithChild(before,after);
 
     }

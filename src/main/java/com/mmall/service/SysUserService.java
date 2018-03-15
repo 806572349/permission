@@ -1,23 +1,22 @@
 package com.mmall.service;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
+import com.mmall.beans.Mail;
 import com.mmall.beans.PageQuery;
 import com.mmall.beans.PageResult;
+import com.mmall.common.RequestHolder;
 import com.mmall.dao.SysUserMapper;
 import com.mmall.exception.ParamException;
 import com.mmall.model.SysUser;
 import com.mmall.param.UserParm;
-import com.mmall.util.BeanValidator;
-import com.mmall.util.MD5Util;
-import com.mmall.util.PasswrodUtil;
+import com.mmall.util.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.xml.crypto.Data;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,11 +49,14 @@ public class SysUserService {
                 .deptId(userParm.getDeptId())
                 .status(userParm.getStatus())
                 .remark(userParm.getRemark()).build();
-        sysUser.setOperator("saveuser"); //TODO:
-        sysUser.setOperateIp("127.0.0.1");
+        sysUser.setOperator(RequestHolder.getCurrentUser().getUsername()); //TODO:
+        sysUser.setOperateIp(IpUtil.getRemoteIp(RequestHolder.getCurrentRequest()));
         sysUser.setOperateTime(new Date());
         // todo: send Email
-
+        Set<String> set  = Sets.<String>newConcurrentHashSet();
+        set.add(userParm.getMail());
+        Mail mail = Mail.builder().receivers(set).message("您的用户名是:" + userParm.getMail() + "初始密码是:" + password + "请尽快登录后台修改你的初始密码").build();
+        MailUtil.send(mail);
         sysUserMapper.insertSelective(sysUser);
 
     }
@@ -86,7 +88,12 @@ public class SysUserService {
                 .mail(userParm.getMail())
                 .deptId(userParm.getDeptId())
                 .status(userParm.getStatus())
+                .operateIp(IpUtil.getUserIP(RequestHolder.getCurrentRequest()))
+                .operator(RequestHolder.getCurrentUser().getUsername())
+                .operateTime(new Date())
                 .remark(userParm.getRemark()).build();
+
+
         sysUserMapper.updateByPrimaryKeySelective(after);
 
         //endregion

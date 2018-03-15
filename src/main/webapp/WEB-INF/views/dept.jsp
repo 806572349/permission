@@ -184,6 +184,7 @@
     {{/deptList}}
 </ol>
 
+
 </script>
 
 <script id="userListTemplate" type="x-tmpl-mustache">
@@ -206,6 +207,7 @@
     </td>
 </tr>
 {{/userList}}
+
 </script>
 
 <script type="application/javascript">
@@ -215,10 +217,10 @@
         var userMap = {};//存储map格式的部门信息
         var opetionStr;
         var deptListTemplate = $('#deptListTemplate').html();
-        var lastClickDeptId=-1;
+        var lastClickDeptId = -1;
         Mustache.parse(deptListTemplate);
 
-        var userListTemplate=$('#userListTemplate').html();
+        var userListTemplate = $('#userListTemplate').html();
         Mustache.parse(userListTemplate);
         loadDeptTree();
 
@@ -228,7 +230,7 @@
                 success: function (result) {
                     if (result.ret) {
                         deptList = result.data;
-                        var rendered = Mustache.render(deptListTemplate, {deptList: result.data})
+                        var rendered = Mustache.render(deptListTemplate, {deptList: result.data});
                         $("#deptList").html(rendered);
                         recursiveRenderDept(result.data);
                         bindDeptClick();
@@ -243,31 +245,32 @@
         function recursiveRenderDept(deptList) {
             if (deptList && deptList.length > 0) {
                 $(deptList).each(function (i, dept) {
-                    deptMap[dept.id]=dept;
-                    if(dept.deptList.length>0){
-                        var  render=Mustache.render(deptListTemplate,{deptList:dept.deptList})
-                        $("#dept_"+dept.id).append(render);
+                    deptMap[dept.id] = dept;
+                    if (dept.deptList.length > 0) {
+                        var render = Mustache.render(deptListTemplate, {deptList: dept.deptList});
+                        $("#dept_" + dept.id).append(render);
                         recursiveRenderDept(dept.deptList)
                     }
                 })
             }
         }
+
         //绑定部门点击事件
         function bindDeptClick() {
             $(".dept-delete").click(function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                var deptId=$(this).attr("data-id");
-                var deptName=$(this).attr("data-name");
-                if(confirm("确定要删除部门｛"+deptName+"吗")){
+                var deptId = $(this).attr("data-id");
+                var deptName = $(this).attr("data-name");
+                if (confirm("确定要删除部门｛" + deptName + "吗")) {
                     //TODO:
-                    console.log("delete depte:"+deptName);
+                    console.log("delete depte:" + deptName);
                 }
             });
             $(".dept-name").click(function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                var deptId=$(this).attr("data-id");
+                var deptId = $(this).attr("data-id");
                 handleDepSelected(deptId);
 
             });
@@ -275,37 +278,37 @@
             $(".dept-edit").click(function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                var deptId=$(this).attr("data-id");
+                var deptId = $(this).attr("data-id");
                 handleDepSelected(deptId);
 
                 $("#dialog-dept-form").dialog({
-                    model:true,
-                    title:"编辑部门",
-                    open:function(event,ui){
-                        $(".ui-dialog-titlebar-close",$(this).parent()).hide();
-                        opetionStr="<option value=\"0\">-</option>";
-                        recursiveRenderDeptSelect(deptList,1);
+                    model: true,
+                    title: "编辑部门",
+                    open: function (event, ui) {
+                        $(".ui-dialog-titlebar-close", $(this).parent()).hide();
+                        opetionStr = "<option value=\"0\">-</option>";
+                        recursiveRenderDeptSelect(deptList, 1);
                         $("#deptForm")[0].reset();
                         $("#parentId").html(opetionStr);
                         $("#deptId").val(deptId);
-                        var  targetDept=deptMap[deptId];
-                        if(targetDept){
+                        var targetDept = deptMap[deptId];
+                        if (targetDept) {
                             $("#parentId").val(targetDept.parentId);
                             $("#deptName").val(targetDept.name);
                             $("#deptSeq").val(targetDept.seq);
                             $("#deptRemark").val(targetDept.remark);
                         }
                     },
-                    buttons:{
-                        "更新":function (e) {
+                    buttons: {
+                        "更新": function (e) {
                             e.preventDefault();
-                            updateDept(false,function (data) {
+                            updateDept(false, function (data) {
                                 $("#dialog-dept-form").dialog("close");
-                            },function (data) {
-                                showMessage("更新部门",data.msg,false);
+                            }, function (data) {
+                                showMessage("更新部门", data.msg, false);
                             })
                         },
-                        "取消":function () {
+                        "取消": function () {
                             $("#dialog-dept-form").dialog("close");
 
                         }
@@ -315,58 +318,59 @@
 
             })
         }
+
         function handleDepSelected(deptId) {
             //
-            if(lastClickDeptId!=-1){
-                var lastDept=$("#dept_" + lastClickDeptId+ " .dd2-content:first");
+            if (lastClickDeptId != -1) {
+                var lastDept = $("#dept_" + lastClickDeptId + " .dd2-content:first");
                 lastDept.removeClass("btn-yellow");
                 lastDept.removeClass("no-hover");
             }
-            var currentDept=$("#dept_" + deptId+ " .dd2-content:first");
+            var currentDept = $("#dept_" + deptId + " .dd2-content:first");
             currentDept.addClass("btn-yellow");
             currentDept.addClass("no-hover");
-            lastClickDeptId=deptId;
+            lastClickDeptId = deptId;
             loadUserList(deptId);
         }
 
         function loadUserList(deptId) {
             //TODO:
-            console.log("deptId+"+deptId)
-            var pageSize=$("#pageSize").val();
-            var url="/sys/user/list.json?deptId="+deptId;
-            var pageNo=$("#userPage .pageNo").val()||1;
+            console.log("deptId+" + deptId)
+            var pageSize = $("#pageSize").val();
+            var url = "/sys/user/list.json?deptId=" + deptId;
+            var pageNo = $("#userPage .pageNo").val() || 1;
             $.ajax({
                 url: url,
                 data: {
-                    pageSize:pageSize,
-                    pageNo:pageNo
+                    pageSize: pageSize,
+                    pageNo: pageNo
                 },
-                success:function(result){
-                    renderUserListAndPage(result,url);
+                success: function (result) {
+                    renderUserListAndPage(result, url);
                 }
             })
         }
 
-        function  renderUserListAndPage(result,url) {
-            if(result.ret){
-                if(result.data.total>0){
-                    var rendered=Mustache.render(userListTemplate,{
-                        userList:result.data.data,
-                        "showDeptName":function () {
+        function renderUserListAndPage(result, url) {
+            if (result.ret) {
+                if (result.data.total > 0) {
+                    var rendered = Mustache.render(userListTemplate, {
+                        userList: result.data.data,
+                        "showDeptName": function () {
                             return deptMap[this.deptId].name;
                         },
-                        "showStatus":function () {
-                            return this.status==1?'有效':(this.status==0?'无效':'删除');
+                        "showStatus": function () {
+                            return this.status == 1 ? '有效' : (this.status == 0 ? '无效' : '删除');
                         },
-                        "bold":function () {
+                        "bold": function () {
                             return function (text, render) {
-                                var status=render(text);
-                                if(status=='有效'){
+                                var status = render(text);
+                                if (status == '有效') {
 
                                     return "<span class='label label-sm label-success'>有效</span>"
-                                }else if(status=="无效"){
+                                } else if (status == "无效") {
                                     return "<span class='label label-sm label-warning'>无效</span>"
-                                }else {
+                                } else {
                                     return "<span class='label'>删除</span>"
                                 }
                             }
@@ -374,48 +378,125 @@
                     });
                     $("#userList").html(rendered);
                     bindUserClick();
-                    $.each(result.data.data,function (i, user) {
-                        userMap[user.id]=user;
+                    $.each(result.data.data, function (i, user) {
+                        userMap[user.id] = user;
                     });
 
-                }else {
+                } else {
                     $("#userList").html('');
                 }
-                var  pageSize=$('#pageSize').val();
-                var pageNo=$("#userPage .pageNo").val()||1;
-                renderPage(url,result.data.total,pageNo,pageSize,result.data.total>0? result.data.data.length:0,"userPage",renderUserListAndPage)
-            }else {
-                showMessage("获取部门下用户列表", result.msg,false);
+                var pageSize = $('#pageSize').val();
+                var pageNo = $("#userPage .pageNo").val() || 1;
+                renderPage(url, result.data.total, pageNo, pageSize, result.data.total > 0 ? result.data.data.length : 0, "userPage", renderUserListAndPage)
+            } else {
+                showMessage("获取部门下用户列表失败", result.msg, false);
             }
 
         }
-        function bindUserClick() {
 
+        $(".user-add").click(function () {
+            $("#dialog-user-form").dialog({
+                model: true,
+                title: "新增用户",
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", $(this).parent()).hide();
+                    opetionStr = "";
+                    recursiveRenderDeptSelect(deptList, 1);
+                    $("#userForm")[0].reset();
+                    $("#deptSelectId").html(opetionStr);
+                },
+                buttons: {
+                    "添加": function (e) {
+                        e.preventDefault();
+                        updateUser(true, function (data) {
+                            $("#dialog-user-form").dialog("close");
+                            loadUserList(lastClickDeptId)
+                        }, function (data) {
+                            showMessage("新增用户", data.msg, false);
+
+                        })
+                    },
+                    "取消": function () {
+                        $("#dialog-user-form").dialog("close");
+
+                    }
+                }
+
+            });
+        });
+
+        function bindUserClick() {
+            $(".user-edit").click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var userId=$(this).attr("data-id");
+                // handleDepSelected(deptId);
+
+                $("#dialog-user-form").dialog({
+                    model:true,
+                    title:"编辑部门",
+                    open:function(event,ui){
+                        $(".ui-dialog-titlebar-close",$(this).parent()).hide();
+                        opetionStr="";
+                        recursiveRenderDeptSelect(deptList,1);
+                        $("#userForm")[0].reset();
+                        $("#deptSelectId").html(opetionStr);
+                        // $("#userId").val(userId);
+                        var  targetUser=userMap[userId];
+                        if(targetUser){
+                            $("#deptSelectId").val(targetUser.deptId);
+                            $("#userName").val(targetUser.username)
+                            $("#userMail").val(targetUser.mail)
+                            $("#userTelephone").val(targetUser.telephone)
+                            $("#userStatus").val(targetUser.status)
+                            $("#userRemark").val(targetUser.remark)
+                            $("#userId").val(targetUser.id)
+                        }
+                    },
+                    buttons:{
+                        "更新":function (e) {
+                            e.preventDefault();
+                            updateUser(false,function (data) {
+                                $("#dialog-user-form").dialog("close");
+                                loadUserList(lastClickDeptId)
+                            },function (data) {
+                                showMessage("更新用户",data.msg,false);
+                                var  targetUser=userMap[userId];
+                                loadUserList(targetUser.deptId);
+                            })
+                        },
+                        "取消":function () {
+                            $("#dialog-user-form").dialog("close");
+
+                        }
+                    }
+                });
+        });
         }
-        
+
         $(".dept-add").click(function () {
             $("#dialog-dept-form").dialog({
-                model:true,
-                title:"新增部门",
-                open:function(event,ui){
-                    $(".ui-dialog-titlebar-close",$(this).parent()).hide();
-                    opetionStr="<option value=\"0\">-</option>";
-                    recursiveRenderDeptSelect(deptList,1);
+                model: true,
+                title: "新增部门",
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", $(this).parent()).hide();
+                    opetionStr = "<option value=\"0\">-</option>";
+                    recursiveRenderDeptSelect(deptList, 1);
                     $("#deptForm")[0].reset();
                     $("#parentId").html(opetionStr);
                 },
-                buttons:{
-                    "添加":function (e) {
+                buttons: {
+                    "添加": function (e) {
                         e.preventDefault();
-                        updateDept(true,function (data) {
+                        updateDept(true, function (data) {
                             $("#dialog-dept-form").dialog("close");
-                        },function (data) {
-                            showMessage("新增部门",data.msg,false);
+                        }, function (data) {
+                            showMessage("新增部门", data.msg, false);
                         })
                     },
-                    "取消":function () {
+                    "取消": function () {
                         $("#dialog-dept-form").dialog("close");
-                        
+
                     }
                 }
 
@@ -423,40 +504,63 @@
 
 
         });
+
         function recursiveRenderDeptSelect(deptList, level) {
-            level=level | 0;
-            if(deptList&&deptList.length>0){
+            level = level | 0;
+            if (deptList && deptList.length > 0) {
                 $(deptList).each(function (i, dept) {
-                    deptMap[dept.id]=dept;
-                    var  blank="";
-                    if(level>1){
-                        for(var j=3;j<=level;j++){
-                            blank +="..";
+                    deptMap[dept.id] = dept;
+                    var blank = "";
+                    if (level > 1) {
+                        for (var j = 3; j <= level; j++) {
+                            blank += "..";
                         }
-                        blank+="*";
+                        blank += "*";
                     }
-                    opetionStr+=Mustache.render("<option value='{{id}}'>{{name}}</option>",{id:dept.id,name:blank+dept.name});
-                    if(dept.deptList.length>0){
-                        recursiveRenderDeptSelect(dept.deptList,level+1);
+                    opetionStr += Mustache.render("<option value='{{id}}'>{{name}}</option>", {
+                        id: dept.id,
+                        name: blank + dept.name
+                    });
+                    if (dept.deptList.length > 0) {
+                        recursiveRenderDeptSelect(dept.deptList, level + 1);
                     }
                 })
             }
         }
-        
-        
-        function updateDept(isCreate, successCallback, failCallback) {
+
+        function updateUser(isCreate, successCallback, failCallback) {
             $.ajax({
-                url:isCreate ? "/sys/dept/sava.json":"/sys/dept/update.json",
-                data:$("#deptForm").serializeArray(),
-                type:'POST',
-                success:function (result) {
-                    if(result.ret){
+                url: isCreate ? "/sys/user/save.json" : "/sys/user/update.json",
+                data: $("#userForm").serializeArray(),
+                type: 'POST',
+                success: function (result) {
+                    if (result.ret) {
                         loadDeptTree();
-                        if(successCallback){
+                        if (successCallback) {
                             successCallback(result);
                         }
-                    }else {
-                        if(failCallback){
+                    } else {
+                        if (failCallback) {
+                            failCallback(result);
+                        }
+                    }
+                }
+            })
+        }
+
+        function updateDept(isCreate, successCallback, failCallback) {
+            $.ajax({
+                url: isCreate ? "/sys/dept/sava.json" : "/sys/dept/update.json",
+                data: $("#deptForm").serializeArray(),
+                type: 'POST',
+                success: function (result) {
+                    if (result.ret) {
+                        loadDeptTree();
+                        if (successCallback) {
+                            successCallback(result);
+                        }
+                    } else {
+                        if (failCallback) {
                             failCallback(result);
                         }
                     }
@@ -466,6 +570,7 @@
         }
 
     })
+
 
 </script>
 </body>
