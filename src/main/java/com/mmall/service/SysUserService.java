@@ -56,7 +56,7 @@ public class SysUserService {
         Set<String> set  = Sets.<String>newConcurrentHashSet();
         set.add(userParm.getMail());
         Mail mail = Mail.builder().receivers(set).message("您的用户名是:" + userParm.getMail() + "初始密码是:" + password + "请尽快登录后台修改你的初始密码").build();
-        MailUtil.send(mail);
+        MailUtil.sendAsyc(mail);
         sysUserMapper.insertSelective(sysUser);
 
     }

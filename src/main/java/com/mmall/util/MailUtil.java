@@ -8,6 +8,9 @@ import org.apache.commons.mail.HtmlEmail;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Slf4j
 public class MailUtil {
@@ -19,7 +22,7 @@ public class MailUtil {
         int port = 587;
         String host = "smtp.qq.com";
         String pass = "ifnvdukbfoesbegh";
-        String nickname = "后台";
+        String nickname = "老司机后台管理";
 
         HtmlEmail email = new HtmlEmail();
         try {
@@ -40,6 +43,13 @@ public class MailUtil {
             log.error(from + "发送邮件到" + StringUtils.join(mail.getReceivers(), ",") + "失败", e);
             return false;
         }
+    }
+
+    public static  void sendAsyc(Mail mail){
+        ExecutorService es = Executors.newFixedThreadPool(10);
+        Future<?> submit = es.submit(() -> {
+            send(mail);
+        });
     }
 
 

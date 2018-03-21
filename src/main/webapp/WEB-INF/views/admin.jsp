@@ -21,7 +21,7 @@
             <a href="/admin/page.do" class="navbar-brand">
                 <small>
                     <i class="fa fa-leaf"></i>
-                    管理员控制台
+                    老司机管理员控制台
                 </small>
             </a>
         </div>
