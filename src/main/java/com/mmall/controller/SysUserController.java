@@ -46,7 +46,7 @@ public class SysUserController {
         return JsonData.success("test");
     }
 
-    @GetMapping("list.json")
+    @GetMapping("page.json")
     @ResponseBody
     public JsonData page(@RequestParam("deptId")Integer deptId,
                          PageQuery page
